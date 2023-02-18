@@ -24,20 +24,26 @@
       </div>
     </div>
     <div style="display:flex;justify-content: center">
-      <div id="box_article" class="box_article">
-        <div v-for="item in article" ref="content" class="box_article_style">
+      <div id="box_article"  class="box_article">
+        <div v-for="item in article"  :id="`article_id_${item.article_id}`" :key="item.article_id" class="box_article_style">
           <a>{{ item.article_title || "标题" }}</a>
-          <p style="height: 60px;">{{ item.article_content || "正文" }}</p>
-          <!--                <p style="height: 60px;">{{  introduce || "正文" }}</p>-->
+          <p :class="state.textOver && !state.foldBtn ? ' showEllipsis' : ''"  style="height: 60px;" >{{ item.article_content || "正文" }}</p>
           <div style="color:white;font-size: 10px">
-            <a>{{ "时间：" + item.creat_time || "时间：" + new Date().getDate() }}</a>
+            <a>{{ "时间：" + formatDate(item.creat_time) || "时间：" + formatDate(new Date().getDate()) }}</a>
             <a style="margin-left: 10px">标签：{{ item.nav_collect }}</a>
-            <a v-if="item.article_content" style="float: right;color: lightblue" @click="isexpansion">
+            <a v-if="item.article_content" v-show="!state.textOver" style="float: right;color: lightblue"   @click="expansion(item.article_id)">
               <el-icon>
                 <ArrowDownBold/>
               </el-icon>
               点击展开
             </a>
+            <a  v-show="state.textOver" style="float: right;color: lightblue" @click="state.foldBtn = !state.foldBtn">
+              <el-icon>
+                <ArrowDownBold/>
+              </el-icon>
+              点击收起
+            </a>
+
           </div>
         </div>
       </div>
@@ -64,12 +70,30 @@
 
 <script lang="ts" setup>
 import Subscript from "@/assets/icon/subscript.vue";
-import {nextTick, reactive, Ref, ref} from "vue";
+import {reactive, Ref, ref} from "vue";
 import axios from "axios";
 import Link from "@/assets/icon/link.vue";
 import {ArrowDownBold} from "@element-plus/icons-vue";
 
-const isexpansion = ref(true)
+const state = reactive({
+  textOver: false, // 超过2行
+  foldBtn: false // 按钮默认显示缩起
+})
+
+const expansion = (id) => {
+  const domRef =  document.getElementById(`article_id_${id}`)
+  console.log(domRef)
+  if (domRef) {
+    const height = window.getComputedStyle(domRef).height.replace("px", "")
+    console.log(height)
+    if (+height > 100) { // 40 -- 2行的高度
+      state.textOver= true;
+    } else {
+      state.textOver= false;
+    }
+  }
+}
+
 
 interface article {
   code: string,
@@ -84,7 +108,6 @@ interface article {
     creat_time: string,
   }]
 }
-
 interface nav {
   code: string,
   msg: string,
@@ -105,93 +128,24 @@ const homeinfo: Ref<{}> = ref({})
 const openUrl = (url: string) => {
   window.open(url)
 }
+
+
 const clickslide = () => {
   // @ts-ignore: Object is possibly 'null'.
   document.getElementById("box_article").scrollIntoView({behavior: 'smooth'});
 }
-const state = reactive({
-  showTotal: false, // 是否展示所有文本内容
-  showExchangeButton: false, // 是否显示展开收起按钮
-  showLine: 3 // 显示的文本行数
-})
-const introduce = ref(' ') // 初始化文本
-const desc = ref(null) // 文本组件
 
-
-/** 文本的操作方法 */
-const txtMethods = {
-  /** 将HTML文本转化为文字文本 */
-  toText: (HTML) => {
-    var input = HTML
-    return input.replace(/<(style|script|iframe)[^>]*?>[\s\S]+?<\/\1\s*>/gi, '').replace(/<[^>]+?>/g, '').replace(/\s+/g, ' ').replace(/ /g, ' ').replace(/>/g, ' ')
-  },
-
-  /** 截取三行文本 */
-  txtDec: () => {
-    if (!desc.value) {
-      return
-    }
-    if (introduce.value) { // 对页面中的元素重新赋值，否则会采用之前裁剪过的文本
-      desc.value.innerHTML = introduce.value
-    } else {
-      return
-    }
-
-    nextTick(() => {
-      let rows = desc.value.getClientRects().length // 文本行数
-      let txt = introduce.value // 文本
-      // 文本为3行时的字数长度
-      let tl = 0 // eslint-disable-line no-unused-vars
-      if (rows < state.showLine) { // 未超出行数，返回
-        desc.value.innerHTML = introduce.value
-        state.seriesInfo.introduction.length - introduce.value.length > 10 ? state.showExchangeButton = true : state.showExchangeButton = false // html元素大于30个字符，显示展开按钮
-        return
-      }
-
-      // 数据量大时速度太慢，需优化(二分法？)
-      while (rows > state.showLine) { // 超出，遍历文字并进行截取，直到文本小于三行
-        let step = 1 // 末尾扣除的字数
-        if (/<br\/>$/.test(txt)) { // 回退的时候，如果碰到换行要整体替换
-          step = 5
-        }
-        txt = txt.slice(0, -step) // 截取
-        desc.value.innerHTML = txt
-        rows = desc.value.getClientRects().length
-        tl += step
-      }
-      if (txt.charCodeAt(txt.length - 1) < 255) { // 文字末尾留三个字符的空并加省略号(中文字符和英文字符留空大小不同，中文-3，英文-8)
-        desc.value.innerHTML = txt.slice(0, -8) + '...'
-      } else {
-        desc.value.innerHTML = txt.slice(0, -3) + '...'
-      }
-      state.showExchangeButton = true // 显示展开收起按钮
-      state.exchangeButton = true
-    })
-  }
+function formatDate(datetime) {
+  let date = new Date(datetime); //datetime时间戳为13位毫秒级别,如为10位需乘1000
+  let month = ("0" + (date.getMonth() + 1)).slice(-2)
+  let sdate = ("0" + date.getDate()).slice(-2)
+  let hour = ("0" + date.getHours()).slice(-2)
+  let minute = ("0" + date.getMinutes()).slice(-2)
+  let second = ("0" + date.getSeconds()).slice(-2)
+  let thatDate = date.getFullYear() + "-" + month + "-" + sdate + " " + hour + ":" + minute + ":" + second;
+  // 返回
+  return thatDate;
 }
-
-const debounce = (fn, wait) => {
-  let timer2 = null
-  return function () {
-    if (timer2 !== null) {
-      clearTimeout(timer2)
-    }
-    timer2 = setTimeout(fn, wait)
-  }
-}
-
-/** 点击展开/收起按钮 */
-const clickTotal = () => {
-  state.showTotal = !state.showTotal
-  // 页面数据过多时txtDec的循环块会运行一段时间，造成点击“收起”按钮时卡顿
-  // 解决方法：在收起时为父元素增加max-height样式，达到隐藏效果
-  // 解决失败：初步判断是vue的虚拟dom算法，不能立即更新元素样式，等到nextTick后才会更新
-  !state.showTotal ? desc.value.parentNode.style['max-height'] = `${20 * state.showLine}px` : desc.value.parentNode.style['max-height'] = ''
-  state.showTotal ? desc.value.innerHTML = introduce.value : txtMethods.txtDec()
-}
-/** 窗口尺寸改变时重新计算文本的显示长度：使用防抖函数实现 */
-window.addEventListener('resize', debounce(txtMethods.txtDec, 200))
-
 
 // 文章展示
 axios.get('http://101.42.34.131:3000/api/home/article').then(res => {
@@ -217,6 +171,7 @@ axios.get('http://101.42.34.131:3000/api/home/info').then((res => {
   }
 }))
 </script>
+
 <style lang="css" scoped>
 * {
   color: white;
@@ -309,6 +264,7 @@ axios.get('http://101.42.34.131:3000/api/home/info').then((res => {
   overflow: hidden;
 }
 
+
 .box_article_style {
   border-radius: 20px;
   width: 450px;
@@ -335,5 +291,9 @@ axios.get('http://101.42.34.131:3000/api/home/info').then((res => {
 .blogger_introduction_statistics {
   display: flex;
   justify-content: space-around;
+}
+
+.showEllipsis{
+  text-overflow: ellipsis;display: -webkit-box;-webkit-line-clamp: 2;line-clamp: 2;-webkit-box-orient: vertical;
 }
 </style>
