@@ -80,7 +80,7 @@ const state = reactive({
   foldBtn: false // 按钮默认显示缩起
 })
 
-const expansion = (id) => {
+const expansion = (id:any) => {
   const domRef =  document.getElementById(`article_id_${id}`)
   console.log(domRef)
   if (domRef) {
