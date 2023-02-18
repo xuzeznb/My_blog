@@ -9,14 +9,16 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
+        with:
+            persist-credentials: false
 
       - name: Install and Build
-        run: |
-          yarn install
-          yarn run build
+        run: yarn install && yarn run build
 
       - name: Deploy
-        uses: peaceiris/actions-gh-pages@v3
+        uses: JamesIves/github-pages-deploy-action@releases/v3
         with:
           personal_token: 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
-          publish_dir: ./dist
+          REPOSITORY_NAME: somenzz/somenzz.github.io
+          BRANCH: master
+          FOLDER: publc
