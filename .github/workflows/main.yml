@@ -21,4 +21,4 @@ jobs:
           personal_token: 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
           REPOSITORY_NAME: somenzz/somenzz.github.io
           BRANCH: master
-          FOLDER: ./publc
+          FOLDER: docs/.vuepress/dist
