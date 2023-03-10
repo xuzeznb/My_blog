@@ -10,7 +10,7 @@
         </el-table-column>
         <el-table-column :label="article_info.title" width="180">
           <template #default="scope">
-            {{ scope.row.article_title || "无" }}
+            <div style="font-size: 5px" v-html="scope.row.article_title"></div>
           </template>
         </el-table-column>
         <el-table-column :label="article_info.creat_time" width="180">
@@ -113,7 +113,7 @@ let myinfo = await server.My_Info().then();
     });
   };
   const handleDelete = async (row: any) => {
-    let Dele_article = await server.Delet_article(Number(row));
+    let Dele_article = await server.Delet_article(row);
     if (Dele_article.data.code == 200) {
       ElMessage({
         message: Dele_article.data.msg,

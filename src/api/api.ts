@@ -50,8 +50,16 @@ const http = {
     return await server.httpObj.post("api/tags", { tag_name: Tags_content });
   },
   // 查询所有标签和文章数量
-  async article_Num(){
-    return await server.httpObj.get('api/tags').then().catch(err=>console.log(err))
+  async article_Num() {
+    return await server.httpObj
+      .get("api/tags")
+      .then()
+      .catch((err) => console.log(err));
+  },
+  //更新文章
+  async update_article(data:any){
+    return await server.httpObj.post('api/update_article',data).then()
   }
+
 };
 export default http;

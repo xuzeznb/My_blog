@@ -28,9 +28,16 @@ const routes: Array<RouteRecordRaw> = [
     component: () => import("../views/backstage/login.vue"),
   },
   {
-    path: "/backstage/home",
+    path: '/404',
+    name:'notDent',
+    component: () => import ('../components/404.vue')
+  },
+
+  {
+    path: "/backstage",
     name: "backstage_home",
     component: () => import("../views/backstage/home.vue"),
+    redirect:'/backstage/article_setting',
     children: [
       {
         path: "/backstage/User_setting",
@@ -69,6 +76,10 @@ const routes: Array<RouteRecordRaw> = [
     name: "m_tags",
     component: () => import("../views/Mobile/m_tags.vue"),
   },
+  {
+    path: '/:catchAll(.*)',//匹配未定义的路由
+    redirect: '/404'//重定向
+  },
 ];
 
 const router = createRouter({
@@ -78,12 +89,9 @@ const router = createRouter({
 
 router.beforeEach((to, form, next) => {
   let token = localStorage.token;
-  if (to.path == "/backstage" || to.path == "/backstage/") {
-    next({ path: "/backstage/login" });
-  }
   if (token) {
     if (to.path == "/backstage" || to.path == "/backstage/login") {
-      next({ path: "/backstage/home" });
+      next({ path: "/backstage" });
     }
   }
   next();

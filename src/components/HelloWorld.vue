@@ -74,8 +74,11 @@
               }}</a>
               <!-- TODO 标签页未完成 -->
               <a style="margin-left: 10px" v-show="item.article_label"
-                >标签：<a href="javascript:;" @click="clickTag(item.article_label)"
-                  style="color: aqua; text-decoration: none">
+                >标签：<a
+                  href="javascript:;"
+                  @click="clickTag(item.article_label)"
+                  style="color: aqua; text-decoration: none"
+                >
                   {{ item.article_label }}</a
                 ></a
               >
@@ -174,9 +177,9 @@ const state = reactive({
       .scrollIntoView({ behavior: "smooth" });
   };
 
-  const clickTag = (content:string)=>{
-    router.push({path:'/articleTag',query:{c:content}})
-  }
+  const clickTag = (content: string) => {
+    router.push({ path: "/articleTag", query: { c: content } });
+  };
 
   const nav: Ref<nav[]> = ref([]);
   const openUrl = (url: string) => {

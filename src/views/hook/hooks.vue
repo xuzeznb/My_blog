@@ -88,7 +88,7 @@
                 <el-button size="large" @click="dialogFormVisible = false"
                   >退出</el-button
                 >
-                <el-button size="large" type="primary" @click="">
+                <el-button size="large" type="primary" @click="onBack(my_Info)">
                   保存
                 </el-button>
               </span>
@@ -138,8 +138,8 @@ const dialogFormVisible = ref(false);
 
   const router_name = router.currentRoute.value.name;
   const formLabelWidth = "140px";
-  const onBack = () => {
-    console.log("0000");
+  const onBack = (data:any) => {
+      console.log(data)
   };
   const exitlogin = () => {
     localStorage.clear();

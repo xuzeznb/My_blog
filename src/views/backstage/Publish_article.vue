@@ -74,11 +74,20 @@
           "
         >
           <el-button
+              v-show="!article_id"
             size="large"
             style="float: right"
             type="success"
             @click="saveData"
             >保存文章
+          </el-button>
+          <el-button
+              v-show="article_id"
+              size="large"
+              style="float: right"
+              type="success"
+              @click="update_article(text)"
+          >更新文章
           </el-button>
         </div>
       </div>
@@ -96,11 +105,16 @@ import server from "../../api/api";
 import "md-editor-v3/lib/style.css";
 import router from "@/router";
 
-const name = ref("");
-  const label = ref("");
+const label = ref("");
   const text = ref("");
   const username = ref("");
   const userid = ref("");
+
+  const inputValue = ref("");
+  const dynamicTags:any = ref([]);
+  const inputVisible = ref(false);
+  const InputRef = ref<InstanceType<typeof ElInput>>();
+
   // 从子组件hooks里面传值到子组件
   const clickEven = (name: any, id: any) => {
     (username.value = name), (userid.value = id);
@@ -111,7 +125,7 @@ const name = ref("");
     const res: any = await server
       .Save_Article({
         article_content: converter.makeHtml(text.value),
-        article_label: "1245",
+        article_label: dynamicTags.value,
         article_author: username.value,
         article_author_id: userid.value,
       })
@@ -124,20 +138,28 @@ const name = ref("");
     }
   };
 
-  /**
-   * 获取路由传的ID
-   */
-
+  const update_article = async() => {
+    let res = await server.update_article({
+      article_author: label.value,
+      article_content: text.value,
+      article_username: username.value,
+      article_author_id: userid.value,
+      article_id: article_id,
+      article_label:dynamicTags.value
+    })
+    if (res.data.code){
+      ElMessage.success(res.data.msg)
+    }
+  }
+  //获取文章id
   const article_id = router.currentRoute.value.query.id;
+  console.log(article_id)
   if (article_id) {
+    //查询文章内容
     let { data } = await server.Select_article(article_id);
     text.value = data.data[0].article_content;
+    dynamicTags.value.push(data.data[0].article_label)
   }
-
-  const inputValue = ref("");
-  const dynamicTags = ref(["Tag 1", "Tag 2", "Tag 3"]);
-  const inputVisible = ref(false);
-  const InputRef = ref<InstanceType<typeof ElInput>>();
 
   const handleClose = (tag: string) => {
     dynamicTags.value.splice(dynamicTags.value.indexOf(tag), 1);
@@ -149,7 +171,6 @@ const name = ref("");
       InputRef.value!.input!.focus();
     });
   };
-
   const handleInputConfirm = () => {
     if (inputValue.value) {
       dynamicTags.value.push(inputValue.value);
