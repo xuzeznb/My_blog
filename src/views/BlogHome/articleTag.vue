@@ -18,22 +18,21 @@
     >
       <div>
         <h3>
-          <a href="javascript:;" style="text-decoration: none; padding: 0 15px;color: #fe9501;font-size: 17px"
-             @click="router.push({path:'/'})"
+          <a href="javascript:;" style="text-decoration: none; padding: 0 15px;color: #fe9501;font-size: 17px" @click="router.push({path:'/'})"
             ><el-icon style="padding: 0 5px" size="15"><Back /></el-icon>
-            返回</a
-          >当前<strong style="padding: 0 10px">{{ route_content }}</strong
-          >标签下的文章
+            返回</a>当前<strong style="padding: 0 10px">{{ route_content }}</strong>标签下的文章
         </h3>
       </div>
       <el-divider></el-divider>
-      <div style="display: flex; justify-content: left">
+      <div v-show="!article_id.length" ><el-empty :image-size="200" /></div>
+      <div v-show="article_id.length" style="display: flex; justify-content: left" >
         <div
           v-for="item in article_id"
           style="padding: 10px"
           @click="router_path(item.article_id)"
         >
-          <div
+          <div>
+            <div
             class="tag_content"
             style="
               width: 260px;
@@ -60,8 +59,9 @@
             ></p>
           </div>
         </div>
+        </div>
       </div>
-    </div>
+      </div>
   </div>
 </template>
 <script lang="ts" setup>

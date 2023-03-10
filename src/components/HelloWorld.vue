@@ -1,6 +1,8 @@
 <!--主页-->
 <template>
   <div
+      id="img"
+      v-loading.fullscreen.lock="fullscreenLoading"
     v-lazy:backhround-image="homeinfo.home_background"
     style="
       background: no-repeat;
@@ -72,7 +74,6 @@
                 "时间：" + utils.formatDate(item.creat_time) ||
                 "时间：" + utils.formatDate(new Date().getDate())
               }}</a>
-              <!-- TODO 标签页未完成 -->
               <a style="margin-left: 10px" v-show="item.article_label"
                 >标签：<a
                   href="javascript:;"
@@ -122,33 +123,30 @@
 
 <script lang="ts" setup>
 import Subscript from "@/assets/icon/subscript.vue";
-import {onMounted, onUnmounted, reactive, Ref, ref} from "vue";
+import {nextTick, reactive, Ref, ref} from "vue";
 import Link from "@/assets/icon/link.vue";
 import router from "@/router";
 import utils from "../utils/index";
 import http from "../api/api";
+import {ElLoading} from "element-plus";
 
 const state = reactive({
     textOver: ref(false), // 超过2行
     foldBtn: ref(false), // 按钮默认显示缩起
   });
 
-  onMounted(() => {
-    document.addEventListener(
-      "scroll",
-      utils.throttle(() => {
-        console.log("节流");
-      }, 200),
-      true
-    );
-  });
-  onUnmounted(() => {
-    document.removeEventListener(
-      "scroll",
-      utils.throttle(() => {}, 200),
-      true
-    );
-  });
+nextTick(()=>{
+
+  const loading = ElLoading.service({
+    lock: true,
+    text: '加载中....',
+    background: 'rgb(255,255,255)',
+  })
+
+  setTimeout(() => {
+    loading.close()
+  }, 2000)
+})
 
   // 路由跳转
   const expansion = (full_text: number) => {
