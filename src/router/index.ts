@@ -59,6 +59,11 @@ const routes: Array<RouteRecordRaw> = [
         name: "文件管理",
         component: () => import("../views/backstage/File_setting.vue"),
       },
+      {
+        path:'/backstage/tag_setting',
+        name:"主页设置",
+        component:()=>import('../views/backstage/tag_setting.vue')
+      }
     ],
   },
   {
@@ -94,6 +99,9 @@ router.beforeEach((to, form, next) => {
       next({ path: "/backstage" });
     }
   }
+  if (token  === '') {
+    next({path:'/backstage/login'})
+   }
   next();
 });
 

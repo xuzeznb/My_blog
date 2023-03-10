@@ -48,19 +48,12 @@
           </el-icon>
           <template #title>文章发布</template>
         </el-menu-item>
-        <el-menu-item index="4">
-          <el-icon>
-            <setting />
-          </el-icon>
-          <template #title>主页设置</template>
-        </el-menu-item>
-        <el-menu-item index="5">
+        <el-menu-item index="tag_setting">
           <el-icon>
             <CollectionTag />
           </el-icon>
           <template #title>标签管理</template>
         </el-menu-item>
-
         <el-menu-item index="file_setting">
           <el-icon>
             <Document />
@@ -77,7 +70,7 @@
 
 <script lang="ts" setup>
 import {ref} from "vue";
-import {CollectionTag, Document, Menu as IconMenu, Setting, User,} from "@element-plus/icons-vue";
+import {CollectionTag, Document, Menu as IconMenu, User,} from "@element-plus/icons-vue";
 
 const isCollapse = ref(true);
   const onEnterTd = () => {

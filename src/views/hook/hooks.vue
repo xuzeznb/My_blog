@@ -138,8 +138,8 @@ const dialogFormVisible = ref(false);
 
   const router_name = router.currentRoute.value.name;
   const formLabelWidth = "140px";
-  const onBack = (data:any) => {
-      console.log(data)
+  const onBack = async (data:any) => {
+     await server.update_User(data)
   };
   const exitlogin = () => {
     localStorage.clear();

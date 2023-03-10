@@ -86,7 +86,7 @@
               size="large"
               style="float: right"
               type="success"
-              @click="update_article(text)"
+              @click="update_article()"
           >更新文章
           </el-button>
         </div>
@@ -96,6 +96,7 @@
   </div>
 </template>
 <script lang="ts" setup>
+// noinspection TypeScriptCheckImport
 import showdown from "showdown";
 import Hooks from "@/views/hook/hooks.vue";
 import {nextTick, ref} from "vue";
@@ -130,7 +131,7 @@ const label = ref("");
         article_author_id: userid.value,
       })
       .catch((err) => {
-        ElMessage.error("保存失败");
+        ElMessage.error("保存失败 ==>" + err);
       });
     if (res.data.code) {
       ElMessage.success(res?.message ?? "新增成功");

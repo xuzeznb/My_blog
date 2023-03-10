@@ -18,7 +18,8 @@
     >
       <div>
         <h3>
-          <a href="javascript:;" style="text-decoration: none; padding: 0 15px"
+          <a href="javascript:;" style="text-decoration: none; padding: 0 15px;color: #fe9501;font-size: 17px"
+             @click="router.push({path:'/'})"
             ><el-icon style="padding: 0 5px" size="15"><Back /></el-icon>
             返回</a
           >当前<strong style="padding: 0 10px">{{ route_content }}</strong
@@ -95,8 +96,6 @@ import {Back} from "@element-plus/icons-vue";
 
   for (let i = 0; res_Data.length > i; i++) {
     run(res_Data[i].article_id);
-    // console.log(11)
-    // res.push(...article_data.data.data)
   }
 </script>
 

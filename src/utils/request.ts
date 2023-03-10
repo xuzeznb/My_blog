@@ -6,7 +6,7 @@ axios.defaults.timeout = 5000;
 let windows = "127.0.0.1";
 let liunx = "101.42.34.131";
 const service = axios.create({
-  baseURL: `http://${liunx}:3000/`,
+  baseURL: `http://${windows}:3000/`,
   timeout: 6000,
   headers: {
     "Content-type": "application/json",

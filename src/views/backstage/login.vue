@@ -45,9 +45,10 @@
           </el-form-item>
           <br />
           <el-form-item>
-            <el-button style="width: 200px" type="primary" @click="onSubmit()"
+            <el-button v-show="onlogin" style="width: 200px" type="primary" @click="onSubmit()"
               >登录</el-button
             >
+            <el-button v-show="!onlogin" loading style="width: 200px" type="primary">登录中</el-button>
           </el-form-item>
         </el-form>
       </div>
@@ -81,7 +82,7 @@ import router from "@/router";
 
 const username: any = utils.debounceRef("");
   const password: any = utils.debounceRef("");
-
+const onlogin = ref(true)
   //主页信息API
   const home_info = ref({});
   let homeInfo = await http.home_info();
@@ -97,25 +98,30 @@ const username: any = utils.debounceRef("");
   const login_info: any = ref([]);
   console.log(login_info.value);
   const onSubmit = async () => {
-    let loginInfo = await http.login_info({
-      username: username.value,
-      password: password.value,
-    });
-    login_info.value = loginInfo.data.data;
-    localStorage.setItem("token", login_info.value.token);
-    if (loginInfo.data.code == 200) {
-      ElMessage({
-        type: "success",
-        message: "登陆成功！",
+    onlogin.value = false
+    setTimeout(async () => {
+      let loginInfo = await http.login_info({
+        username: username.value,
+        password: password.value,
       });
-      router.push("/backstage/home").then();
-      console.log("submit!");
-    } else {
-      ElMessage({
-        type: "err",
-        message: "账号或密码错误！！",
-      });
-    }
+      login_info.value = loginInfo.data.data;
+      localStorage.setItem("token", login_info.value.token);
+      if (loginInfo.data.code == 200) {
+        onlogin.value = false
+        await router.push("/backstage")
+        location.reload();
+        ElMessage({
+          type: "success",
+          message: "登陆成功！",
+        });
+        onlogin.value = false
+      } else {
+        ElMessage({
+          type: "err",
+          message: "账号或密码错误！！",
+        });
+      }
+    }, 3000)
   };
 </script>
 

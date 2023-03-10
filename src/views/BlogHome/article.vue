@@ -11,7 +11,7 @@
   >
     <div
       class="active_top"
-      style="position: relative; top: 20px; height: 520px; overflow: auto"
+      style="position: relative; top: 15px; height:70%; overflow: auto"
     >
       <div class="nav_header">
         <el-page-header @back="goBack">
