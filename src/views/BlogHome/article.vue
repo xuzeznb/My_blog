@@ -20,12 +20,10 @@
           </template>
         </el-page-header>
       </div>
-      <div
-        v-highlight
-        class="header_article_content"
-        v-html="article_content.article_content"
-      ></div>
-
+      <v-md-editor v-model="article_content.article_content" mode="preview" @copy-code-success="handleCopyCodeSuccess" />
+      <div>
+        <p></p>
+      </div>
       <div class="active_info">
         <span
           ><el-icon size="15"><Timer /></el-icon
@@ -54,24 +52,40 @@
   </div>
 </template>
 <script lang="ts" setup>
+import VueMarkdownEditor from '@kangc/v-md-editor';
+// @ts-ignore
+import createCopyCodePlugin from '@kangc/v-md-editor/lib/plugins/copy-code/index';
 import {CollectionTag, Timer, User} from "@element-plus/icons-vue";
 import router from "@/router";
 import {ref} from "vue";
 import utils from "../../utils";
 import server from "../../api/api";
 import "md-editor-v3/lib/style.css";
+import '@kangc/v-md-editor/lib/theme/style/github.css';
+// import vuepressTheme from '@kangc/v-md-editor/lib/theme/vuepress.js';
+// import '@kangc/v-md-editor/lib/theme/style/vuepress.css';
+import githubTheme from '@kangc/v-md-editor/lib/theme/github.js';
 import hljs from "highlight.js";
 
-hljs.initHighlightingOnLoad();
-  const goBack = () => {
+VueMarkdownEditor.use(createCopyCodePlugin());
+
+VueMarkdownEditor.use(githubTheme, {
+  Hljs:hljs,
+});
+
+
+
+ const goBack = () => {
     router.push({ path: "/" });
   };
   //获取路由参数
   let article_id = router.currentRoute.value.query.id;
   //查询文章的UserID获取文章
-  const article_content: any = ref([]);
+const article_content: any = ref([]);
+const article_h1: any = ref([]);
   let Select_article = await server.Select_article(String(article_id));
   article_content.value = Select_article.data.data[0];
+
   //获取主页背景
   const home_info: any = ref();
   let myinfo = await server.home_info().then();
@@ -105,25 +119,9 @@ hljs.initHighlightingOnLoad();
   }
 
   .header_article_content {
-    text-indent: 2em;
     line-height: 28px;
   }
 
-  >>> .header_article_content > pre {
-    overflow: hidden;
-    overflow-x: scroll;
-    overflow-y: hidden;
-  }
-
-  >>> .header_article_content > h1 {
-    font-size: 25px;
-    color: #fe9501;
-    padding: 10px;
-  }
-
-  >>> .header_article_content > p {
-    padding: 10px;
-  }
 
   .active_info {
     margin-top: 10px;

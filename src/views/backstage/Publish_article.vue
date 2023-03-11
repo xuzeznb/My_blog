@@ -91,7 +91,8 @@
           </el-button>
         </div>
       </div>
-      <editor v-model="text" pageFullScreen></editor>
+      <v-md-editor v-show="!article_id"  v-model="text" height="400px"  preview-class="vuepress-markdown-body"></v-md-editor>
+      <v-md-editor v-show="article_id"  v-model="text" height="400px"  preview-class="vuepress-markdown-body"></v-md-editor>
     </div>
   </div>
 </template>
@@ -101,12 +102,24 @@ import showdown from "showdown";
 import Hooks from "@/views/hook/hooks.vue";
 import {nextTick, ref} from "vue";
 import {ElInput, ElMessage} from "element-plus";
-import Editor from "md-editor-v3";
 import server from "../../api/api";
 import "md-editor-v3/lib/style.css";
 import router from "@/router";
 
-const label = ref("");
+import githubTheme from '@kangc/v-md-editor/lib/theme/github.js';
+import '@kangc/v-md-editor/lib/theme/style/github.css';
+import VueMarkdownEditor, {xss} from '@kangc/v-md-editor';
+import hljs from "highlight.js";
+import createLineNumbertPlugin from '@kangc/v-md-editor/lib/plugins/line-number/index';
+
+VueMarkdownEditor.use(createLineNumbertPlugin());
+
+VueMarkdownEditor.use(githubTheme, {
+  Hljs:hljs,
+  vue:'html'
+});
+
+  const label = ref("");
   const text = ref("");
   const username = ref("");
   const userid = ref("");
@@ -116,16 +129,76 @@ const label = ref("");
   const inputVisible = ref(false);
   const InputRef = ref<InstanceType<typeof ElInput>>();
 
+  const toolbar = {
+    katex:{
+      title: '公式',
+      action(editor) {
+        editor.insert(function(selected) {
+          const content = '$$\\sum_{i=1}^n a_i=0$$'
+          return {
+            text: `${content}`,
+            selected: content
+          }
+        })
+      }
+    },
+    mermaid: {
+      title: '流程图',
+      icon: 'el-icon-data-analysis',
+      action(editor) {
+        editor.insert(function(selected) {
+          const content = '```mermaid\n' +
+              'graph LR\n' +
+              'A --- B\n' +
+              'B-->C[fa:fa-ban forbidden]\n' +
+              'B-->D(fa:fa-spinner);\n' +
+              '```'
+          return {
+            text: `${content}`,
+            selected: content
+          }
+        })
+      }
+    },
+    exportMd: {
+      title: '导入',
+      icon: 'el-icon-upload2',
+      action(editor) {
+        editor.insert(function(selected) {
+          alert('该功能未实现')
+          return {
+            text: ''
+          }
+        })
+      }
+    },
+    importMd: {
+      title: '导出',
+      icon: 'el-icon-download',
+      action(editor) {
+        editor.insert(function(selected) {
+          alert('该功能未实现')
+          return {
+            text: ''
+          }
+        })
+      }
+    }
+  }
+
+
   // 从子组件hooks里面传值到子组件
   const clickEven = (name: any, id: any) => {
     (username.value = name), (userid.value = id);
   };
+  console.log()
   // 保存数据
   const saveData = async () => {
     const converter = new showdown.Converter();
     const res: any = await server
       .Save_Article({
-        article_content: converter.makeHtml(text.value),
+        article_markdown:text.value,
+        article_content:xss.process(VueMarkdownEditor.vMdParser.themeConfig.markdownParser.render(text.value)),
         article_label: dynamicTags.value,
         article_author: username.value,
         article_author_id: userid.value,
@@ -142,7 +215,8 @@ const label = ref("");
   const update_article = async() => {
     let res = await server.update_article({
       article_author: label.value,
-      article_content: text.value,
+      article_markdown:text.value,
+      article_content: xss.process(VueMarkdownEditor.vMdParser.themeConfig.markdownParser.render(text.value)),
       article_username: username.value,
       article_author_id: userid.value,
       article_id: article_id,
@@ -154,12 +228,11 @@ const label = ref("");
   }
   //获取文章id
   const article_id = router.currentRoute.value.query.id;
-  console.log(article_id)
   if (article_id) {
     //查询文章内容
-    let { data } = await server.Select_article(article_id);
-    text.value = data.data[0].article_content;
-    dynamicTags.value.push(data.data[0].article_label)
+    let article_data = await server.Select_article(article_id);
+      text.value =  article_data.data.data[0].article_markdown
+    // dynamicTags.value.push(data.data[0].article_label)
   }
 
   const handleClose = (tag: string) => {

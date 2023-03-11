@@ -32,7 +32,7 @@ const httpObj = {
 
     return await axios.request({
 
-      url: `http://${liunx}:3000/${url} `,
+      url: `http://${windows}:3000/${url} `,
       method: "delete",
       data: { id: data.id },
       headers: {

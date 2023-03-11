@@ -57,8 +57,7 @@
             class="box_article_style"
           >
             <div>
-              <h6
-                @click="expansion(item.article_id)"
+              <h6 style="cursor: pointer" @click="expansion(item.article_id)"
                 v-html="item.article_title"
               ></h6>
             </div>
@@ -98,20 +97,18 @@
             />
           </div>
           <div class="blogger_introduction">
-            <p
-              style="
+            <p style="
                 display: flex;
                 justify-content: center;
                 color: white;
                 margin-top: 10px;
-              "
-            >
+              ">
               {{ homeinfo.home_name || "Mr_ze" }}
             </p>
             <br />
             <p class="blogger_introduction_statistics">
               <a>文章：{{ homeinfo.home_articleNub || "0" }}</a>
-              <a>标签：{{ homeinfo.home_labelsNub || "0" }}</a>
+              <a>标签：<router-link style="color: #fe9501;font-size: 17px;text-decoration: none" to="/tag">{{  tagsnub.data.data.length|| "0" }}</router-link></a>
               <a>收藏：{{ homeinfo.home_collect || "0" }}</a>
             </p>
           </div>
@@ -127,7 +124,7 @@ import {nextTick, reactive, Ref, ref} from "vue";
 import Link from "@/assets/icon/link.vue";
 import router from "@/router";
 import utils from "../utils/index";
-import http from "../api/api";
+import serve from "../api/api";
 import {ElLoading} from "element-plus";
 
 const state = reactive({
@@ -135,18 +132,31 @@ const state = reactive({
     foldBtn: ref(false), // 按钮默认显示缩起
   });
 
-nextTick(()=>{
-
-  const loading = ElLoading.service({
-    lock: true,
-    text: '加载中....',
-    background: 'rgb(255,255,255)',
+// 判断用户是否第一次打开网页，若第一次打开就增加遮罩层，防止用户体验不好
+if(window.name == ""){
+  window.name = "loaded";//首次进入时给window.name赋一个固定值
+  nextTick(()=>{
+    const loading = ElLoading.service({
+      lock: true,
+      text: '加载中....',
+      background: 'rgb(255,255,255)',
+    })
+    setTimeout(() => {
+      loading.close()
+    }, 2000)
   })
-
-  setTimeout(() => {
-    loading.close()
-  }, 2000)
-})
+}else{
+  nextTick(()=>{
+    const loading = ElLoading.service({
+      lock: true,
+      text: '加载中....',
+      background: 'rgb(255,255,255)',
+    })
+    setTimeout(() => {
+      loading.close()
+    }, 500)
+  })
+}
 
   // 路由跳转
   const expansion = (full_text: number) => {
@@ -155,18 +165,19 @@ nextTick(()=>{
 
   //文章API
   const article: any = ref([]);
-  const { data } = await http.home_article();
+  const { data } = await serve.home_article();
   article.value = data.data;
 
   //主页信息API
   const homeinfo: any = ref([]);
-  let home_info = await http.home_info();
+  let home_info = await serve.home_info();
   homeinfo.value = home_info.data?.data[0];
 
   // 主页导航栏信息
   const homenav: any = ref([]);
-  let home_nav = await http.home_nav();
+  let home_nav = await serve.home_nav();
   homenav.value = home_nav.data.data;
+  let  tagsnub = await serve.article_Num();
 
   const clickslide = () => {
     // @ts-ignore: Object is possibly 'null'.
