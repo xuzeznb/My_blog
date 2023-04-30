@@ -57,12 +57,12 @@ const http = {
       .catch((err) => console.log(err));
   },
   //更新文章
-  async update_article(data:any){
-    return await server.httpObj.post('api/update_article',data).then()
+  async update_article(data: any) {
+    return await server.httpObj.post("api/update_article", data).then();
   },
-//  更新个人信息
-  async update_User(data:any){
-    return await server.httpObj.post('api/update_User',data).then()
-  }
+  //  更新个人信息
+  async update_User(data: any) {
+    return await server.httpObj.post("api/update_User", data).then();
+  },
 };
 export default http;

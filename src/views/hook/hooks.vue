@@ -1,3 +1,4 @@
+<!--suppress ALL -->
 <template>
   <div>
     <div style="width: 40px; float: left; margin-left: 15px">
@@ -102,10 +103,10 @@
 
 <script lang="ts" setup>
 import router from "@/router";
-import {defineProps, reactive, ref, watch} from "vue";
+import { defineProps, reactive, ref, watch } from "vue";
 import server from "@/api/api";
-import {ElMessage, ElMessageBox} from "element-plus";
-import {Expand} from "@element-plus/icons-vue";
+import { ElMessage, ElMessageBox } from "element-plus";
+import { Expand } from "@element-plus/icons-vue";
 
 const dialogFormVisible = ref(false);
 
@@ -138,8 +139,8 @@ const dialogFormVisible = ref(false);
 
   const router_name = router.currentRoute.value.name;
   const formLabelWidth = "140px";
-  const onBack = async (data:any) => {
-     await server.update_User(data)
+  const onBack = async (data: any) => {
+    await server.update_User(data);
   };
   const exitlogin = () => {
     localStorage.clear();
@@ -165,10 +166,6 @@ const dialogFormVisible = ref(false);
   });
 </script>
 <style scoped>
-  .nav_header {
-    margin: 15px 15px 0 15px;
-  }
-
   >>> .el-page-header__back {
     display: none !important;
   }

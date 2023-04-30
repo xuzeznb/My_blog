@@ -48,7 +48,7 @@
 </template>
 <script lang="ts" setup>
 //获取主页背景
-import {ref} from "vue";
+import { ref } from "vue";
 import server from "@/api/api";
 
 const home_info: any = ref();

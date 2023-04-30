@@ -1,4 +1,4 @@
-import {customRef, ref} from "vue";
+import { customRef, ref } from "vue";
 
 const utils = {
   formatDate(datetime: any) {

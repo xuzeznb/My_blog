@@ -12,7 +12,8 @@
   </div>
 </template>
 <script lang="ts" setup>
-import {Search} from "@element-plus/icons-vue";</script>
+import { Search } from "@element-plus/icons-vue";
+</script>
 <style>
   .home_nav {
     width: 100%;

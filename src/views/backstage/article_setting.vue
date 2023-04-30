@@ -2,7 +2,7 @@
   <div class="article_setting">
     <Hooks :value="dele" />
     <div class="article_setting_label">
-      <el-table :data="my_article" style="width: 1100px">
+      <el-table :data="my_article" style="width: 1300px">
         <el-table-column :label="article_info.id" width="180">
           <template #default="scope">
             {{ scope.row.article_id || "无" }}
@@ -43,22 +43,22 @@
             </div>
           </template>
         </el-table-column>
+
+        <el-table-column :label="article_info.tags" width="180">
+          <template #default="scope">
+            <div style="display: flex; align-items: center">
+              <span
+                ><el-tag>{{ scope.row.article_label || "无" }}</el-tag></span
+              >
+            </div>
+          </template>
+        </el-table-column>
+
         <el-table-column :label="article_info.name" width="180">
           <template #default="scope">
-            <el-popover
-              effect="light"
-              placement="top"
-              trigger="hover"
-              width="auto"
-            >
-              <template #default>
-                <div>name: {{ scope.row.article_author || "Mr_Ze" }}</div>
-                <div>address: {{ scope.row.address }}</div>
-              </template>
-              <template #reference>
-                <el-tag>{{ scope.row.article_author || "Mr_Ze" }}</el-tag>
-              </template>
-            </el-popover>
+            <span>
+              <el-tag>{{ scope.row.article_author || "Mr_Ze" }}</el-tag>
+            </span>
           </template>
         </el-table-column>
         <el-table-column :label="article_info.operation">
@@ -81,10 +81,10 @@
 <script lang="ts" setup>
 import router from "@/router";
 import server from "@/api/api";
-import {Timer} from "@element-plus/icons-vue";
+import { Timer } from "@element-plus/icons-vue";
 import Hooks from "@/views/hook/hooks.vue";
 import utils from "@/utils/index";
-import {ElMessage} from "element-plus";
+import { ElMessage } from "element-plus";
 
 let myinfo = await server.My_Info().then();
   if (myinfo.status != 200) {
@@ -127,8 +127,9 @@ let myinfo = await server.My_Info().then();
     title: "文章标题",
     content: "文章内容",
     creat_time: "发布时间",
-    name: "名字",
+    name: "作者",
     operation: "操作",
+    tags: "标签",
   };
 </script>
 <style scoped>

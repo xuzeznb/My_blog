@@ -18,14 +18,27 @@
     >
       <div>
         <h3>
-          <a href="javascript:;" style="text-decoration: none; padding: 0 15px;color: #fe9501;font-size: 17px" @click="router.push({path:'/'})"
-            ><el-icon style="padding: 0 5px" size="15"><Back /></el-icon>
-            返回</a>当前<strong style="padding: 0 10px">{{ route_content }}</strong>标签下的文章
+          <a
+            href="javascript:;"
+            style="
+              text-decoration: none;
+              padding: 0 15px;
+              color: #fe9501;
+              font-size: 17px;
+            "
+            @click="router.push({ path: '/' })"
+          >
+            <el-icon size="15" style="padding: 0 5px"><Back /></el-icon>返回 </a
+          >当前<strong style="padding: 0 10px">{{ route_content }}</strong
+          >标签下的文章
         </h3>
       </div>
       <el-divider></el-divider>
-      <div v-show="!article_id.length" ><el-empty :image-size="200" /></div>
-      <div v-show="article_id.length" style="display: flex; justify-content: left" >
+      <div v-show="!article_id.length"><el-empty :image-size="200" /></div>
+      <div
+        v-show="article_id.length"
+        style="display: flex; justify-content: left"
+      >
         <div
           v-for="item in article_id"
           style="padding: 10px"
@@ -33,43 +46,43 @@
         >
           <div>
             <div
-            class="tag_content"
-            style="
-              width: 260px;
-              background: #f7f4f4;
-              border-radius: 10px;
-              height: auto;
-            "
-          >
-            <a
-              href="javascript:;"
-              style="display: flex; padding: 10px 5px 10px 20px"
-              v-html="item.article_title"
-            ></a>
-            <div style="margin-top: 11px" class="box_article_text">
+              class="tag_content"
+              style="
+                width: 260px;
+                background: #f7f4f4;
+                border-radius: 10px;
+                height: auto;
+              "
+            >
+              <a
+                href="javascript:;"
+                style="display: flex; padding: 10px 5px 10px 20px"
+                v-html="item.article_title"
+              ></a>
+              <div class="box_article_text" style="margin-top: 11px">
+                <p
+                  class="black"
+                  style="font-size: 10px"
+                  v-html="item.article_content"
+                ></p>
+              </div>
               <p
-                class="black"
-                style="font-size: 10px"
-                v-html="item.article_content"
+                style="padding: 10px 20px; font-size: 10px"
+                v-html="utils.formatDate(item.creat_time)"
               ></p>
             </div>
-            <p
-              style="padding: 10px 20px; font-size: 10px"
-              v-html="utils.formatDate(item.creat_time)"
-            ></p>
           </div>
         </div>
-        </div>
       </div>
-      </div>
+    </div>
   </div>
 </template>
 <script lang="ts" setup>
-import {ref} from "vue";
+import { ref } from "vue";
 import server from "@/api/api";
 import router from "@/router";
 import utils from "@/utils";
-import {Back} from "@element-plus/icons-vue";
+import { Back } from "@element-plus/icons-vue";
 
 // 获取主题信息
   const home_info: any = ref();

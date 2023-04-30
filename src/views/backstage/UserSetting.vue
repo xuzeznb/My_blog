@@ -24,9 +24,9 @@
   </div>
 </template>
 <script lang="ts" setup>
-import {ref} from "vue";
+import { ref } from "vue";
 
-import type {UploadFile} from "element-plus";
+import type { UploadFile } from "element-plus";
 import server from "@/api/api";
 import router from "@/router";
 import Hooks from "@/views/hook/hooks.vue";

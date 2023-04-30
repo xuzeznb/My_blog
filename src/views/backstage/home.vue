@@ -69,8 +69,8 @@
 </template>
 
 <script lang="ts" setup>
-import {ref} from "vue";
-import {CollectionTag, Document, Menu as IconMenu, User,} from "@element-plus/icons-vue";
+import { ref } from "vue";
+import { CollectionTag, Document, Menu as IconMenu, User } from "@element-plus/icons-vue";
 
 const isCollapse = ref(true);
   const onEnterTd = () => {

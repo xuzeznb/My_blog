@@ -14,7 +14,7 @@
 <script setup lang="ts">
 import M_hooks from "@/views/Mobile/m_hooks.vue";
 import router from "@/router";
-import {ref} from "vue";
+import { ref } from "vue";
 import server from "@/api/api";
 
 const article_id = router.currentRoute.value.query.id;

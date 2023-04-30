@@ -1,88 +1,125 @@
+<!--suppress ALL -->
 <template>
-  <div
-    v-lazy:backhround-image="home_info.home_background"
-    :style="{
-      background: 'no-repeat',
-      'background-size': 'cover',
-      '-moz-background-size': ' cover',
-      '-webkit-background-size': 'cover',
-    }"
-    class="active"
-  >
-    <div
-      class="active_top"
-      style="position: relative; top: 15px; height:70%; overflow: auto"
-    >
-      <div class="nav_header">
-        <el-page-header @back="goBack">
-          <template #content>
-            <span class="text-large font-600 mr-3"> 文章详细 </span>
-          </template>
-        </el-page-header>
+  <div >
+    <div style="background-color: #f2f3f5; ">
+      <div class="catalogue" style="position: fixed; top: 100px; width: 250px; left: 20px">
+        <div style="font-size: 14px; background-color: white">
+          <h3 style="height: 40px;line-height: 40px; margin-top: 10px; text-align: center">
+            目录
+          </h3>
+          <div style="overflow: auto; height: 400px">
+            <div
+              v-for="anchor in titles"
+              :style="{ padding: `5px 0 5px ${anchor.indent * 10}px` }"
+              @click="handleAnchorClick(anchor)"
+            >
+              <a style="cursor: pointer">{{ anchor.title }}</a>
+            </div>
+          </div>
+        </div>
       </div>
-      <v-md-editor v-model="article_content.article_content" mode="preview" @copy-code-success="handleCopyCodeSuccess" />
-      <div>
-        <p></p>
-      </div>
-      <div class="active_info">
-        <span
-          ><el-icon size="15"><Timer /></el-icon
-          ><a style="margin-left: 5px">{{
-            utils.formatDate(article_content.creat_time)
-          }}</a></span
-        >
-        <span style="margin-left: 20px"
-          ><el-icon size="15"><User /></el-icon
-          ><a style="margin-left: 5px">{{
-            article_content.article_author || "无法提供信息"
-          }}</a></span
-        >
-        <span style="margin-left: 20px"
-          ><el-icon size="15"><CollectionTag /></el-icon
-          ><a
-            href="javascript:;"
-            style="margin-left: 5px; color: orange; text-decoration: none"
-            @click="articleLabel(article_content.article_label)"
-            >{{ article_content.article_label }}</a
-          ></span
-        >
-        <el-backtop :bottom="100" :right="100" />
+      <div style="display: flex; justify-content: center">
+        <div style="width: 60% ;margin-top: 60px;">
+          <MdEditor
+            ref="preview"
+            v-model="article_content.article_markdown"
+            :include-level="[3, 4]"
+            :language="language"
+            :noPrettier="true"
+            :previewOnly="true"
+            :showCodeRowNumber="true"
+            class="c-markdown"
+            mode="preview"
+            style="padding: 30px"
+            theme="light"
+          >
+          </MdEditor>
+          <div class="active_info">
+            <span>
+              <el-icon size="15"><Timer /></el-icon>
+              <a style="margin-left: 5px">
+                {{ utils.formatDate(article_content.creat_time) }}</a
+              ></span
+            >
+            <span style="margin-left: 20px">
+              <el-icon size="15"><User /></el-icon>
+              <a style="margin-left: 5px">
+                {{ article_content.article_author || "无法提供信息" }}</a
+              >
+            </span>
+            <span style="margin-left: 20px">
+              <el-icon size="15">
+                <CollectionTag />
+              </el-icon>
+              <a
+                href="javascript:;"
+                style="margin-left: 5px; color: orange; text-decoration: none"
+                @click="articleLabel(article_content.article_label)"
+              >
+                {{ article_content.article_label }}
+              </a>
+            </span>
+            <el-backtop :bottom="100" :right="100" />
+          </div>
+        </div>
       </div>
     </div>
   </div>
 </template>
 <script lang="ts" setup>
-import VueMarkdownEditor from '@kangc/v-md-editor';
 // @ts-ignore
-import createCopyCodePlugin from '@kangc/v-md-editor/lib/plugins/copy-code/index';
-import {CollectionTag, Timer, User} from "@element-plus/icons-vue";
+import { ArrowLeft, CollectionTag, Timer, User } from "@element-plus/icons-vue";
 import router from "@/router";
-import {ref} from "vue";
+import { onMounted, ref } from "vue";
 import utils from "../../utils";
 import server from "../../api/api";
 import "md-editor-v3/lib/style.css";
-import '@kangc/v-md-editor/lib/theme/style/github.css';
-// import vuepressTheme from '@kangc/v-md-editor/lib/theme/vuepress.js';
-// import '@kangc/v-md-editor/lib/theme/style/vuepress.css';
-import githubTheme from '@kangc/v-md-editor/lib/theme/github.js';
-import hljs from "highlight.js";
+import "@kangc/v-md-editor/lib/theme/style/github.css";
+import "@kangc/v-md-editor/lib/plugins/copy-code/copy-code.css";
+import MdEditor from "md-editor-v3";
 
-VueMarkdownEditor.use(createCopyCodePlugin());
-
-VueMarkdownEditor.use(githubTheme, {
-  Hljs:hljs,
-});
-
-
-
- const goBack = () => {
+const anchors = ref();
+  const preview: any = ref(null);
+  const titles = ref();
+  onMounted(() => {
+    anchors.value = preview.value.$el.querySelectorAll("h1,h2,h3,h4,h5,h6");
+    titles.value = Array.from(anchors.value).filter(
+      (title: any) => !!title.innerText.trim()
+    );
+    if (!titles.value.length) {
+      titles.value = [];
+      return;
+    }
+    const hTags = Array.from(
+      new Set(titles.value.map((title: any) => title.tagName))
+    ).sort();
+    titles.value = titles.value.map((el: any) => ({
+      title: el.innerText,
+      lineIndex: el.offsetTop,
+      indent: parseInt(el.tagName.slice(1)) - 1,
+    }));
+  });
+  const handleAnchorClick = (anchor: any) => {
+    const { lineIndex } = anchor;
+    window.scrollTo(0, lineIndex);
+  };
+  //
+  const language = ref("my-lang");
+  // let scroll = ref(
+  //   document.documentElement.scrollTop || document.body.scrollTop
+  // );
+  // onMounted(() => {
+  //
+  //   window.removeEventListener("scroll", scroll.value);
+  // });
+  const goBack = () => {
     router.push({ path: "/" });
   };
   //获取路由参数
   let article_id = router.currentRoute.value.query.id;
   //查询文章的UserID获取文章
-const article_content: any = ref([]);
-const article_h1: any = ref([]);
+  const article_content: any = ref([]);
+  const article_h1: any = ref([]);
   let Select_article = await server.Select_article(String(article_id));
   article_content.value = Select_article.data.data[0];
 
@@ -91,37 +128,33 @@ const article_h1: any = ref([]);
   let myinfo = await server.home_info().then();
   home_info.value = myinfo.data.data[0];
 
-  const articleLabel = (content) => {
+  const articleLabel = (content: string) => {
     console.log(content);
     // router.push()
   };
 </script>
 <style scoped>
   .active {
-    background-size: cover;
-    -moz-background-size: cover;
-    -webkit-background-size: cover;
+    /*background-size: cover;*/
+    /*-moz-background-size: cover;*/
+    /*-webkit-background-size: cover;*/
     display: flex;
     height: 100vh;
     justify-content: center;
     align-items: center;
   }
-
+>>> h1{
+    text-align: center;
+}
   .active_top {
-    background: white;
-    filter: alpha(Opacity=90);
-    -moz-opacity: 0.8;
-    opacity: 0.8;
+    /*filter: alpha(Opacity=90);*/
+    /*-moz-opacity: 0.8;*/
+    /*opacity: 0.8;*/
     width: 900px;
     min-width: 800px;
     border-radius: 50px;
     padding: 30px;
   }
-
-  .header_article_content {
-    line-height: 28px;
-  }
-
 
   .active_info {
     margin-top: 10px;
@@ -131,9 +164,9 @@ const article_h1: any = ref([]);
     font-size: 15px;
   }
 
-  ::-webkit-scrollbar {
-    width: 10px;
-  }
+  /*::-webkit-scrollbar {*/
+  /*  width: 10px;*/
+  /*}*/
 
   /* 这是针对缺省样式 (必须的) */
   ::-webkit-scrollbar-track {

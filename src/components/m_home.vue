@@ -25,8 +25,8 @@
   </div>
 </template>
 <script lang="ts" setup>
-import {CollectionTag, Timer} from "@element-plus/icons-vue";
-import {ref} from "vue";
+import { CollectionTag, Timer } from "@element-plus/icons-vue";
+import { ref } from "vue";
 import http from "@/api/api";
 import utils from "../utils/index";
 import router from "@/router";

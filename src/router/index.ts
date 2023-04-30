@@ -1,4 +1,4 @@
-import {createRouter, createWebHistory, RouteRecordRaw} from "vue-router";
+import { createRouter, createWebHistory, RouteRecordRaw } from "vue-router";
 
 // @ts-ignore
 const routes: Array<RouteRecordRaw> = [
@@ -28,16 +28,16 @@ const routes: Array<RouteRecordRaw> = [
     component: () => import("../views/backstage/login.vue"),
   },
   {
-    path: '/404',
-    name:'notDent',
-    component: () => import ('../components/404.vue')
+    path: "/404",
+    name: "notDent",
+    component: () => import("../components/404.vue"),
   },
 
   {
     path: "/backstage",
     name: "backstage_home",
     component: () => import("../views/backstage/home.vue"),
-    redirect:'/backstage/article_setting',
+    redirect: "/backstage/article_setting",
     children: [
       {
         path: "/backstage/User_setting",
@@ -60,10 +60,10 @@ const routes: Array<RouteRecordRaw> = [
         component: () => import("../views/backstage/File_setting.vue"),
       },
       {
-        path:'/backstage/tag_setting',
-        name:"主页设置",
-        component:()=>import('../views/backstage/tag_setting.vue')
-      }
+        path: "/backstage/tag_setting",
+        name: "主页设置",
+        component: () => import("../views/backstage/tag_setting.vue"),
+      },
     ],
   },
   {
@@ -82,8 +82,8 @@ const routes: Array<RouteRecordRaw> = [
     component: () => import("../views/Mobile/m_tags.vue"),
   },
   {
-    path: '/:catchAll(.*)',//匹配未定义的路由
-    redirect: '/404'//重定向
+    path: "/:catchAll(.*)", //匹配未定义的路由
+    redirect: "/404", //重定向
   },
 ];
 
@@ -99,9 +99,9 @@ router.beforeEach((to, form, next) => {
       next({ path: "/backstage" });
     }
   }
-  if (token  === '') {
-    next({path:'/backstage/login'})
-   }
+  if (token === "") {
+    next({ path: "/backstage/login" });
+  }
   next();
 });
 

@@ -74,7 +74,7 @@
           "
         >
           <el-button
-              v-show="!article_id"
+            v-show="!article_id"
             size="large"
             style="float: right"
             type="success"
@@ -82,17 +82,21 @@
             >保存文章
           </el-button>
           <el-button
-              v-show="article_id"
-              size="large"
-              style="float: right"
-              type="success"
-              @click="update_article()"
-          >更新文章
+            v-show="article_id"
+            size="large"
+            style="float: right"
+            type="success"
+            @click="update_article()"
+            >更新文章
           </el-button>
         </div>
       </div>
-      <v-md-editor v-show="!article_id"  v-model="text" height="400px"  preview-class="vuepress-markdown-body"></v-md-editor>
-      <v-md-editor v-show="article_id"  v-model="text" height="400px"  preview-class="vuepress-markdown-body"></v-md-editor>
+      <v-md-editor
+        v-show="article_id"
+        v-model="text"
+        height="600px"
+        preview-class="vuepress-markdown-body"
+      ></v-md-editor>
     </div>
   </div>
 </template>
@@ -100,24 +104,24 @@
 // noinspection TypeScriptCheckImport
 import showdown from "showdown";
 import Hooks from "@/views/hook/hooks.vue";
-import {nextTick, ref} from "vue";
-import {ElInput, ElMessage} from "element-plus";
+import { nextTick, ref } from "vue";
+import { ElInput, ElMessage } from "element-plus";
 import server from "../../api/api";
 import "md-editor-v3/lib/style.css";
 import router from "@/router";
 
-import githubTheme from '@kangc/v-md-editor/lib/theme/github.js';
-import '@kangc/v-md-editor/lib/theme/style/github.css';
-import VueMarkdownEditor, {xss} from '@kangc/v-md-editor';
+import githubTheme from "@kangc/v-md-editor/lib/theme/github.js";
+import "@kangc/v-md-editor/lib/theme/style/github.css";
+import VueMarkdownEditor, { xss } from "@kangc/v-md-editor";
 import hljs from "highlight.js";
-import createLineNumbertPlugin from '@kangc/v-md-editor/lib/plugins/line-number/index';
+import createLineNumbertPlugin from "@kangc/v-md-editor/lib/plugins/line-number/index";
 
 VueMarkdownEditor.use(createLineNumbertPlugin());
 
-VueMarkdownEditor.use(githubTheme, {
-  Hljs:hljs,
-  vue:'html'
-});
+  VueMarkdownEditor.use(githubTheme, {
+    Hljs: hljs,
+    vue: "html",
+  });
 
   const label = ref("");
   const text = ref("");
@@ -125,80 +129,84 @@ VueMarkdownEditor.use(githubTheme, {
   const userid = ref("");
 
   const inputValue = ref("");
-  const dynamicTags:any = ref([]);
+  const dynamicTags: any = ref([]);
   const inputVisible = ref(false);
   const InputRef = ref<InstanceType<typeof ElInput>>();
 
   const toolbar = {
-    katex:{
-      title: '公式',
+    katex: {
+      title: "公式",
       action(editor) {
-        editor.insert(function(selected) {
-          const content = '$$\\sum_{i=1}^n a_i=0$$'
+        editor.insert(function (selected) {
+          const content = "$$\\sum_{i=1}^n a_i=0$$";
           return {
             text: `${content}`,
-            selected: content
-          }
-        })
-      }
+            selected: content,
+          };
+        });
+      },
     },
     mermaid: {
-      title: '流程图',
-      icon: 'el-icon-data-analysis',
+      title: "流程图",
+      icon: "el-icon-data-analysis",
       action(editor) {
-        editor.insert(function(selected) {
-          const content = '```mermaid\n' +
-              'graph LR\n' +
-              'A --- B\n' +
-              'B-->C[fa:fa-ban forbidden]\n' +
-              'B-->D(fa:fa-spinner);\n' +
-              '```'
+        editor.insert(function (selected) {
+          const content =
+            "```mermaid\n" +
+            "graph LR\n" +
+            "A --- B\n" +
+            "B-->C[fa:fa-ban forbidden]\n" +
+            "B-->D(fa:fa-spinner);\n" +
+            "```";
           return {
             text: `${content}`,
-            selected: content
-          }
-        })
-      }
+            selected: content,
+          };
+        });
+      },
     },
     exportMd: {
-      title: '导入',
-      icon: 'el-icon-upload2',
+      title: "导入",
+      icon: "el-icon-upload2",
       action(editor) {
-        editor.insert(function(selected) {
-          alert('该功能未实现')
+        editor.insert(function (selected) {
+          alert("该功能未实现");
           return {
-            text: ''
-          }
-        })
-      }
+            text: "",
+          };
+        });
+      },
     },
     importMd: {
-      title: '导出',
-      icon: 'el-icon-download',
+      title: "导出",
+      icon: "el-icon-download",
       action(editor) {
-        editor.insert(function(selected) {
-          alert('该功能未实现')
+        editor.insert(function (selected) {
+          alert("该功能未实现");
           return {
-            text: ''
-          }
-        })
-      }
-    }
-  }
-
+            text: "",
+          };
+        });
+      },
+    },
+  };
 
   // 从子组件hooks里面传值到子组件
   const clickEven = (name: any, id: any) => {
     (username.value = name), (userid.value = id);
   };
-  console.log()
+  console.log();
   // 保存数据
   const saveData = async () => {
     const converter = new showdown.Converter();
     const res: any = await server
       .Save_Article({
-        article_markdown:text.value,
-        article_content:xss.process(VueMarkdownEditor.vMdParser.themeConfig.markdownParser.render(text.value)),
+        article_markdown: text.value,
+        article_content: xss.process(
+          VueMarkdownEditor.vMdParser.themeConfig.markdownParser.render(
+            text.value
+          )
+        ),
         article_label: dynamicTags.value,
         article_author: username.value,
         article_author_id: userid.value,
@@ -212,27 +220,34 @@ VueMarkdownEditor.use(githubTheme, {
     }
   };
 
-  const update_article = async() => {
+  const update_article = async () => {
     let res = await server.update_article({
       article_author: label.value,
-      article_markdown:text.value,
-      article_content: xss.process(VueMarkdownEditor.vMdParser.themeConfig.markdownParser.render(text.value)),
+      article_markdown: text.value,
+      article_content: xss.process(
+        VueMarkdownEditor.vMdParser.themeConfig.markdownParser.render(
+          text.value
+        )
+      ),
       article_username: username.value,
       article_author_id: userid.value,
       article_id: article_id,
-      article_label:dynamicTags.value
-    })
-    if (res.data.code){
-      ElMessage.success(res.data.msg)
+      article_label: dynamicTags.value,
+    });
+    if (res.data.code) {
+      ElMessage.success(res.data.msg);
     }
-  }
+  };
   //获取文章id
   const article_id = router.currentRoute.value.query.id;
   if (article_id) {
     //查询文章内容
     let article_data = await server.Select_article(article_id);
-      text.value =  article_data.data.data[0].article_markdown
-    // dynamicTags.value.push(data.data[0].article_label)
+    text.value = article_data.data.data[0].article_markdown;
+    if (!text.value) {
+      ElMessage.error("错误！当前文章不存在！");
+    }
+    dynamicTags.value.push(article_data.data.data[0].article_label);
   }
 
   const handleClose = (tag: string) => {

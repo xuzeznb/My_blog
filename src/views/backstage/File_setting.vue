@@ -43,7 +43,7 @@ import Hooks from '../hooks.vue';
             <div style="display: flex; align-items: center">
               <el-icon><timer /></el-icon>
               <span style="margin-left: 10px">{{
-                scope.row.file_size / 1024 / 1024
+                (scope.row.file_size / 1024 / 1024 + "MB").slice(0, 4) + "MB"
               }}</span>
             </div>
           </template>
@@ -51,14 +51,16 @@ import Hooks from '../hooks.vue';
 
         <el-table-column label="Operations">
           <template #default="scope">
-            <el-button size="small" @click="handleEdit(scope.$index, scope.row)"
-              >Edit</el-button
+            <el-button
+              size="default"
+              @click="handleEdit(scope.$index, scope.row)"
+              >预览</el-button
             >
             <el-button
-              size="small"
+              size="default"
               type="danger"
-              @click="handleDelete(scope.$index, scope.row)"
-              >Delete</el-button
+              @click="handleDelete(scope.row.id)"
+              >删除</el-button
             >
           </template>
         </el-table-column>
@@ -69,7 +71,8 @@ import Hooks from '../hooks.vue';
 <script lang="ts" setup>
 import Hooks from "../hook/hooks.vue";
 import server from "@/api/api";
-import {Timer} from "@element-plus/icons-vue";
+import { Timer } from "@element-plus/icons-vue";
+import { ElMessage, ElMessageBox } from "element-plus";
 
 interface User {
     date: string;
@@ -80,33 +83,28 @@ interface User {
   const handleEdit = (index: number, row: User) => {
     console.log(index, row);
   };
-  const handleDelete = (index: number, row: User) => {
-    console.log(index, row);
+  //TODO:假删除
+  const handleDelete = (id) => {
+    // TODO:删除文件
+    ElMessageBox.confirm(`您确定要删除id为 ${id} 的文件?`, "提示:", {
+      confirmButtonText: "确定",
+      cancelButtonText: "取消",
+      type: "warning",
+    })
+      .then(() => {
+        ElMessage({
+          type: "success",
+          message: "删除成功！",
+        });
+      })
+      .catch(() => {
+        ElMessage({
+          type: "info",
+          message: "取消删除！",
+        });
+      });
   };
 
   const qyery_file = await server.qyrey_File();
   const file = qyery_file.data.data;
-
-  const tableData: User[] = [
-    {
-      date: "2016-05-03",
-      name: "Tom",
-      address: "No. 189, Grove St, Los Angeles",
-    },
-    {
-      date: "2016-05-02",
-      name: "Tom",
-      address: "No. 189, Grove St, Los Angeles",
-    },
-    {
-      date: "2016-05-04",
-      name: "Tom",
-      address: "No. 189, Grove St, Los Angeles",
-    },
-    {
-      date: "2016-05-01",
-      name: "Tom",
-      address: "No. 189, Grove St, Los Angeles",
-    },
-  ];
 </script>
