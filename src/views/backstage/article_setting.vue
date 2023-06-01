@@ -1,6 +1,6 @@
 <template>
   <div class="article_setting">
-    <Hooks :value="dele" />
+    <Hooks />
     <div class="article_setting_label">
       <el-table :data="my_article" style="width: 1300px">
         <el-table-column :label="article_info.id" width="180">
@@ -8,7 +8,7 @@
             {{ scope.row.article_id || "无" }}
           </template>
         </el-table-column>
-        <el-table-column :label="article_info.title" width="180">
+        <el-table-column :label="article_info.title">
           <template #default="scope">
             <div style="font-size: 5px" v-html="scope.row.article_title"></div>
           </template>
@@ -43,28 +43,24 @@
             </div>
           </template>
         </el-table-column>
-
         <el-table-column :label="article_info.tags" width="180">
           <template #default="scope">
             <div style="display: flex; align-items: center">
-              <span
-                ><el-tag>{{ scope.row.article_label || "无" }}</el-tag></span
-              >
+              <span><el-tag>{{ scope.row.article_label || "无" }}</el-tag></span>
             </div>
           </template>
         </el-table-column>
-
         <el-table-column :label="article_info.name" width="180">
           <template #default="scope">
             <span>
-              <el-tag>{{ scope.row.article_author || "Mr_Ze" }}</el-tag>
+              <p>{{ scope.row.article_author || "匿名" }}</p>
             </span>
           </template>
         </el-table-column>
         <el-table-column :label="article_info.operation">
           <template #default="scope">
-            <el-button size="default" @click="handleEdit(scope.row.article_id)"
-              >修改
+            <el-button size="default" @click="handleEdit(scope.row.article_id)">
+              修改
             </el-button>
             <el-button
               size="default"
@@ -85,6 +81,7 @@ import { Timer } from "@element-plus/icons-vue";
 import Hooks from "@/views/hook/hooks.vue";
 import utils from "@/utils/index";
 import { ElMessage } from "element-plus";
+import { ref } from "vue";
 
 let myinfo = await server.My_Info().then();
   if (myinfo.status != 200) {
@@ -93,8 +90,9 @@ let myinfo = await server.My_Info().then();
     router.push({ path: "/backstage/login" });
   }
 
-  const myArticle = await server.home_article();
-  const my_article = myArticle.data.data;
+  const myArticle = ref();
+  myArticle.value = await server.query_articles();
+  const my_article = myArticle.value.data.data;
   const username = myinfo.data.username;
 
   interface User {
@@ -119,7 +117,7 @@ let myinfo = await server.My_Info().then();
         message: Dele_article.data.msg,
         type: "success",
       });
-      location.reload();
+      myArticle.value = await server.query_articles();
     }
   };
   const article_info = {

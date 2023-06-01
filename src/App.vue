@@ -4,9 +4,7 @@
     <template v-show="isshow" #default>
       <router-view />
     </template>
-    <template #fallback>
-        网页加载失败！请耐心等待网页修复！
-    </template>
+    <template #fallback> 网页加载失败！请耐心等待网页修复！ </template>
   </Suspense>
 </template>
 <script lang="ts" setup>
@@ -14,37 +12,37 @@ import { onMounted, ref } from "vue";
 import router from "@/router";
 import { ElLoading } from "element-plus";
 
-const isshow = ref(false)
+const isshow = ref(false);
   const _isMoble = () => {
     let flag = navigator.userAgent.match(
       /(phone|pad|pod|iPhone|iPod|ios|iPad|Android|Mobile|BlackBerry|IEMobile|MQQBrowser|JUC|Fennec|wOSBrowser|BrowserNG|WebOS|Symbian|Windows Phone)/i
     );
     return flag;
   };
-  onMounted(()=> {
+  onMounted(() => {
     const loading = ElLoading.service({
       lock: true,
-      text: 'Loading',
-      spinner: 'el-icon-loading',
-      background: 'rgba(0, 0, 0, 0.9)'
+      text: "Loading",
+      spinner: "el-icon-loading",
+      background: "rgba(0, 0, 0, 0.9)",
     });
-    if (sessionStorage.getItem('isCached')) {
+    if (sessionStorage.getItem("isCached")) {
       //如果有缓存，直接结束loading样式
       //其他操作
       loading.close();
-   isshow.value = true
+      isshow.value = true;
     } else {
-      isshow.value = false
+      isshow.value = false;
       //模拟异步请求数据
       setTimeout(() => {
         //请求完成
         loading.close();
-        isshow.value = true
-        sessionStorage.setItem('isCached', true);
+        isshow.value = true;
+        sessionStorage.setItem("isCached", true);
         //其他操作
       }, 2000);
     }
-  })
+  });
   onMounted(() => {
     if (_isMoble()) {
       router.push({

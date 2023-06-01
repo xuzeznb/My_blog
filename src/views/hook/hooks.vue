@@ -24,8 +24,8 @@
         <template #content>
           <div class="flex items-center">
             <el-avatar :size="32" :src="my_Info.User_avantUrl" class="mr-3" />
-            <span class="text-large font-600 mr-3" style="padding-left: 5px">{{
-              my_Info.User_name
+            <span class="text-large font-600 mr-3" style="padding-left: 10px">{{
+              my_Info.username
             }}</span>
             <el-tag style="margin-left: 5px">{{ "博主" }}</el-tag>
           </div>
@@ -152,7 +152,7 @@ const dialogFormVisible = ref(false);
   my_Info.value = myinfo.data;
 
   const emit = defineEmits(["clickChild"]);
-  emit("clickChild", ...[my_Info.value.User_name, my_Info.value.UserId]);
+  emit("clickChild", ...[my_Info.value]);
 
   const form = reactive({
     name: "",

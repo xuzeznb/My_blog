@@ -2,6 +2,15 @@ import server from "@/utils/request";
 
 let token = localStorage.token;
 const http = {
+  // 删除标签
+  async del_label(id:number){
+    return await server.httpObj.delete('api/del_tag', { id } )
+  },
+  // 查询所有标签
+  async all_label(){
+    let time = new Date().getTime();
+    return await server.httpObj.get(`/api/all_label?t=${time} `).then()
+  },
   // 文章
   async home_article() {
     return await server.httpObj.get("/api/home/article").then();
@@ -24,8 +33,15 @@ const http = {
       .get("/api/My_info", { headers: { token: token } })
       .then();
   },
+  // 查询文章（后台接口，必须要登录！）
+  async query_articles() {
+    return await server.httpObj.get("/api/query_articles", {
+      headers: { token: token },
+    });
+  },
+
   // 通过文章id查询文章内容
-  async Select_article(article_id: string) {
+  async Select_article(article_id: number) {
     return await server.httpObj.post("/api/select_article", { article_id });
   },
   // 发布文章
@@ -42,7 +58,10 @@ const http = {
   },
   //通过id删除文章
   async Delet_article(id: String) {
-    return await server.httpObj.delete("api/article", { id: id, token: token });
+    return await server.httpObj.delete("api/del_article", {
+      id: id,
+      token: token,
+    });
   },
 
   //通过标签名字查询文章id
@@ -64,5 +83,9 @@ const http = {
   async update_User(data: any) {
     return await server.httpObj.post("api/update_User", data).then();
   },
+  async add_tag(data:any){
+    return await server.httpObj.post('/api/add_tags',data).then().catch(e => console.log(e))
+  }
+
 };
 export default http;

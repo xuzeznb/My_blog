@@ -1,6 +1,6 @@
 <template>
   <div class="nav">
-    <Hooks />
+    <Hooks style="padding: 10px" />
     <div style="padding: 15px 15px; width: 1100px">
       <el-descriptions :column="3" class="mt-4" size="small">
         <el-descriptions-item label="用户名:">{{

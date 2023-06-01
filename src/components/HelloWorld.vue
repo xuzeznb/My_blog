@@ -1,9 +1,10 @@
 <!--主页-->
+<!--suppress ALL -->
 <template>
   <div
+    ref="bodyRef"
     id="img"
-    v-loading.fullscreen.lock="fullscreenLoading"
-    v-lazy:backhround-image="homeinfo.home_background"
+    v-lazy="homeinfo.home_background"
     style="
       background: no-repeat;
       height: 100vh;
@@ -18,38 +19,79 @@
         <subscript @click="clickslide" />
       </div>
     </div>
-    <div style="background: rgb(26, 28, 32)">
-      <div class="box" style="">
-        <div class="box_center">
+    <div style="position: relative; background: rgb(242, 243, 245)">
+      <!-- 左边的推荐文章页  -->
+      <div
+        style="
+          position: sticky;
+          top: 90px;
+          left: 200px;
+          background-color: white;
+        "
+      >
+        <div
+          class="box_blogger_introduction"
+          style="position: absolute; left: 100px"
+        >
           <div
-            v-for="item in homenav"
-            :key="item.id"
-            :style="{ background: item.nav_background }"
-            class="box_introduction"
-            style="float: left; margin-left: 30px"
+            style="
+              z-index: 100000;
+              padding: 10px;
+              display: flex;
+              justify-content: center;
+            "
           >
-            <div class="box_text">
-              <p>
-                <a
-                  :style="{ color: item.nav_textColor }"
-                  @click="openUrl(item.nav_url)"
-                  >{{ item.nav_name
-                  }}<a style="margin-left: 10px; margin-top: 5px">
-                    <Link />
-                  </a> </a
-                ><br /><a
-                  :style="{ color: item.nav_textColor }"
-                  style="margin-top: 5px; font-size: 12px"
-                  >{{ item.nav_remarks }}</a
-                >
-              </p>
-            </div>
+            <img
+              :src="homeinfo.home_avanturl"
+              style="border-radius: 50%"
+              width="90"
+            />
+          </div>
+          <div class="blogger_introduction">
+            <h2
+              style="
+                display: flex;
+                justify-content: center;
+                color: black;
+                margin-top: 10px;
+              "
+            >
+              {{ homeinfo.home_name || "Mr_ze" }}
+            </h2>
+            <br />
+            <p class="blogger_introduction_statistics">
+              <a>文章：{{ homeinfo.home_articleNub || "0" }}</a>
+              <a
+                >标签：<router-link
+                  style="color: #fe9501; font-size: 17px; text-decoration: none"
+                  to="/tag"
+                  >{{ tagsnub.data.data.length || "0" }}</router-link
+                ></a
+              >
+              <a>收藏：{{ homeinfo.home_collect || "0" }}</a>
+              <br />
+            </p>
+            <a style="display: flex; justify-content: center; margin-top: 10px"
+              >个性签名:一条闲鱼</a
+            >
           </div>
         </div>
       </div>
+      <div>
+        <!--  导航栏 -->
+        <div
+          v-if="showNavbar"
+          class="navbar"
+          style="position: fixed; width: 100%; top: 0; z-index: 999999999999999"
+        >
+          <Nav />
+        </div>
+      </div>
+      <!--  个人主页  -->
+      <div style="position: absolute; right: 80px; top: 60px"></div>
       <!--   文章   -->
       <div style="display: flex; justify-content: center">
-        <div id="box_article" class="box_article">
+        <div id="box_article" class="box_article" style="position: relative">
           <div
             v-for="(item, index) in article"
             :id="`article_id_${item.article_id}`"
@@ -87,60 +129,75 @@
             </div>
           </div>
         </div>
-        <div class="box_blogger_introduction">
-          <div
-            class="box_blogger_style"
-            style="margin-top: 20px; display: flex; justify-content: center"
-          >
-            <img
-              :src="homeinfo.home_avanturl"
-              style="border-radius: 50%"
-              width="90"
-            />
-          </div>
-          <div class="blogger_introduction">
-            <p
-              style="
-                display: flex;
-                justify-content: center;
-                color: white;
-                margin-top: 10px;
-              "
-            >
-              {{ homeinfo.home_name || "Mr_ze" }}
-            </p>
-            <br />
-            <p class="blogger_introduction_statistics">
-              <a>文章：{{ homeinfo.home_articleNub || "0" }}</a>
-              <a
-                >标签：<router-link
-                  style="color: #fe9501; font-size: 17px; text-decoration: none"
-                  to="/tag"
-                  >{{ tagsnub.data.data.length || "0" }}</router-link
-                ></a
-              >
-              <a>收藏：{{ homeinfo.home_collect || "0" }}</a>
-            </p>
-          </div>
-        </div>
       </div>
     </div>
+    <el-backtop :bottom="100" :right="100" />
   </div>
 </template>
 
 <script lang="ts" setup>
 import Subscript from "@/assets/icon/subscript.vue";
-import { reactive, Ref, ref } from "vue";
-import Link from "@/assets/icon/link.vue";
+import { ElNotification } from "element-plus";
+import { onMounted, reactive, Ref, ref, watch } from "vue";
 import router from "@/router";
 import utils from "../utils/index";
 import serve from "../api/api";
+import Nav from "@/views/hook/nav.vue";
 
-const state = reactive({
+let scrollPosition = ref();
+  const showNavbar = ref(false);
+  const bodyRef: any = ref(null);
+  const width_position = ref();
+  const activeName = ref("first");
+
+  onMounted(() => {
+    let browser_height = getComputedStyle(bodyRef.value).height.replace(
+      /\D+/g,
+      ""
+    );
+    let browser_width = getComputedStyle(bodyRef.value).height.replace(
+      /\D+/g,
+      ""
+    );
+    localStorage.setItem("browser_width", browser_width);
+    localStorage.setItem("browser_height", browser_height);
+    ElNotification({
+      title: "注意",
+      message:
+        "本博客只适配了电脑端的 google 浏览器！其他的浏览器若出现页面混乱请更换浏览器！",
+      type: "warning",
+      position: "bottom-right",
+    });
+  });
+
+  // 获取屏幕的高度
+  window.addEventListener("scroll", function () {
+    scrollPosition.value = window.scrollY; // 获取当前滚动到的距离
+    width_position.value = window.screenX;
+    console.log(window.screenX);
+  });
+  console.log(localStorage.browser_height);
+  // 获取body高度
+  watch(
+    () => scrollPosition.value,
+    (newval, oldval) => {
+      if (Number(newval) > Number(localStorage.browser_height) - 25) {
+        showNavbar.value = true;
+      } else if (Number(newval) < 777) {
+        showNavbar.value = false;
+      }
+    }
+  );
+  watch(
+    () => width_position.value,
+    (newval, oldval) => {
+      console.log(newval, oldval);
+    }
+  );
+  const state = reactive({
     textOver: ref(false), // 超过2行
     foldBtn: ref(false), // 按钮默认显示缩起
   });
-
   // 路由跳转
   const expansion = (full_text: number) => {
     router.push({ path: "/article", query: { id: full_text } });
@@ -150,6 +207,7 @@ const state = reactive({
   const article: any = ref([]);
   const { data } = await serve.home_article();
   article.value = data.data;
+  console.log(article.value);
 
   //主页信息API
   const homeinfo: any = ref([]);
@@ -164,7 +222,7 @@ const state = reactive({
 
   const clickslide = () => {
     // @ts-ignore: Object is possibly 'null'.
-    document
+    documentsha
       .getElementById("box_article")
       .scrollIntoView({ behavior: "smooth" });
   };
@@ -212,18 +270,18 @@ const state = reactive({
 
 <style lang="css" scoped>
   * {
-    color: white;
+    color: black;
   }
-
   .black {
     overflow: hidden;
     text-overflow: ellipsis;
     display: -webkit-box;
-    -webkit-line-clamp: 2;
-    line-clamp: 2;
+    -webkit-line-clamp: 3;
+    line-clamp: 3;
     -webkit-box-orient: vertical;
-    color: white;
+    color: black;
   }
+
   >>> .black > h1 {
     display: none;
   }
@@ -280,34 +338,8 @@ const state = reactive({
     }
   }
 
-  .box_introduction {
-    width: 150px;
-    height: 100px;
-    background: #42b983;
-    margin-top: 15px;
-    border-radius: 10%;
-  }
-
-  .box_introduction:hover {
-    cursor: pointer;
-  }
-
   .header_icon:hover {
     cursor: pointer;
-  }
-
-  .box_text {
-    margin-top: 10px;
-    height: 70px;
-    align-items: center;
-    padding: 0 15px;
-    display: flex;
-    justify-content: left;
-  }
-
-  .box_center {
-    display: flex;
-    justify-content: center;
   }
 
   .box_article {
@@ -316,22 +348,25 @@ const state = reactive({
 
   .box_article_style {
     border-radius: 20px;
-    width: 450px;
-    padding: 15px;
-    background: black;
-    color: white;
+    width: 500px;
+    max-height: 150px;
+    overflow: hidden;
+    padding: 25px;
+    background: white;
+    color: black;
     margin: 30px 0;
   }
   #vue {
     display: none;
   }
   .box_blogger_introduction {
+    background-color: white;
     margin-top: 30px;
     margin-left: 40px;
+    //box-shadow: rgb(136 136 136 / 48%) 0px 0px 10px;
     width: 250px;
     border-radius: 20px;
     height: 280px;
-    background: black;
   }
 
   .blogger_introduction_statistics {
@@ -339,10 +374,15 @@ const state = reactive({
     justify-content: space-around;
   }
 
-  .showEllipsis {
-  }
-
   .box_article_height {
     height: auto;
+  }
+
+  >>> .el-tabs__nav-scroll {
+    display: flex !important;
+    justify-content: center !important;
+  }
+  .arcite_Recommend :hover {
+    color: violet;
   }
 </style>
